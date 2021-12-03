@@ -30,10 +30,4 @@ export default {
     margin-bottom: 20px;
   }
 }
-//X-Small
-// @media screen and (max-width: 576px) {
-//   .listSongs {
-//     flex-direction: column;
-//   }
-// }
 </style>

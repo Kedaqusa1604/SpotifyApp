@@ -74,9 +74,6 @@ export default {
       formatDuration,
     };
   },
-  components: {
-    // ListSongs,
-  },
 };
 </script>
 
