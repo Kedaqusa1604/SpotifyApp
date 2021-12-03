@@ -1,18 +1,182 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="window">
+    <div class="home">
+      <div class="home__search">
+        <p class="home__search_title">Busca una canción</p>
+        <div class="home__search_inputs">
+          <input
+            class="home__search_input"
+            type="text"
+            v-model="songName"
+            placeholder="Introduce el nombre de una canción"
+          />
+          <button class="home__search_button" @click="somefunction">
+            <fa class="icon_Search" :icon="['fas', 'search']" /> Buscar
+          </button>
+        </div>
+      </div>
+      <div class="home__list">
+        <ListSongs :songs="songs" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import { useStore } from "vuex";
+import { computed, onMounted, ref, watchEffect } from "vue";
+import ListSongs from "../components/ListSongs.vue";
 export default {
-  name: 'Home',
+  name: "Home",
+  components: {},
+  setup() {
+    const store = useStore();
+    let songs = computed(() => store.state.songs);
+    let songName = ref("");
+    onMounted(() => {
+      store.dispatch("getSongs", {
+        token: localStorage.getItem("token"),
+        query: "Taylor Swift",
+      });
+    });
+
+    // watchEffect(() => {
+    //   store.dispatch("getSongs", {
+    //     token: localStorage.getItem("token"),
+    //     query: songName.value,
+    //   });
+    // });
+    const somefunction = () => {
+      store.dispatch("getSongs", {
+        token: localStorage.getItem("token"),
+        query: songName.value,
+      });
+    };
+    return {
+      store,
+      songs,
+      songName,
+      somefunction,
+    };
+  },
   components: {
-    HelloWorld
+    ListSongs,
+  },
+};
+</script>
+
+<style lang="scss" scoped>
+$background: hsl(60, 4%, 11%);
+$green_Spotify: #1db954;
+.window {
+  width: 100%;
+  min-height: 100vh;
+  background: $background;
+}
+.home {
+  width: 100%;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 25px;
+  &__search {
+    padding: 0 20px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 20px;
+    &_title {
+      font-weight: 600;
+      font-size: 2em;
+      color: #eeeeee;
+      text-align: center;
+    }
+    &_inputs {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    &_button {
+      background: $green_Spotify;
+      width: 30%;
+      max-width: 100px;
+      outline: none;
+      border: 1px solid #606061;
+      border-radius: 0 5px 5px 0;
+      font-size: 16px;
+      color: #fefefe;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .icon_Search {
+        margin-right: 10px;
+      }
+      &:before {
+        content: "";
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-radius: inherit;
+        background: transparent;
+        transition: background-color 0.3s ease;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+      &:hover:before {
+        background: rgba(0, 0, 0, 0.2);
+      }
+    }
+    &_input {
+      width: 70%;
+      max-width: 400px;
+      height: 35px;
+      outline: none;
+      border-radius: 5px 0 0 5px;
+      border: 1px solid #606061;
+      padding: 0 10px;
+      font-size: 17px;
+      background: #fefefe;
+      transition: all 0.3s ease;
+      &:focus {
+        border-color: $green_Spotify;
+        box-shadow: 0 0 7px $green_Spotify;
+      }
+      &::placeholder {
+        color: rgba(0, 0, 0, 0.3);
+      }
+    }
   }
 }
-</script>
+
+//X-Small
+@media screen and (max-width: 576px) {
+  .home {
+    &__search {
+      font-size: 17px;
+      &_inputs {
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+      }
+      &_button,
+      &_input {
+        width: 100%;
+        max-width: 400px;
+        margin-top: 5px;
+        border-radius: 5px;
+      }
+      &_button {
+        height: 35px;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+</style>
