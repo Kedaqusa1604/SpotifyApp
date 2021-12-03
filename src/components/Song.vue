@@ -9,7 +9,8 @@
     <div class="card__artist">
       <p class="card__artist_text" v-text="artist"></p>
       <template v-if="explicit">
-        <p>Explicit</p>
+        <div class="explicit"></div>
+        <!-- <p>Explicit</p> -->
       </template>
     </div>
   </div>
@@ -99,6 +100,15 @@ $background: #464646;
     align-items: flex-end;
     font-size: 13px;
     color: #a3a7a6;
+    .explicit {
+      height: 70%;
+      width: 50px;
+      background: red;
+      background: url("../assets/Explicit.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: right;
+    }
   }
 }
 // X-Small

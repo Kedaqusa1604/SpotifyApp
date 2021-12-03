@@ -9,14 +9,9 @@ import { getToken } from "./api/getToken";
 export default {
   setup() {
     onMounted(() => {
-      // localStorage.removeItem("token");
       getToken().then((token) => {
         localStorage.setItem("token", token.access_token);
       });
-      // store.dispatch("getSongs", {
-      //   token: localStorage.getItem("token"),
-      //   query: "forever",
-      // });
     });
   },
 };

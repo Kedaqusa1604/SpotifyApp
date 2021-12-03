@@ -3,28 +3,46 @@
     <div class="home">
       <div class="home__search">
         <p class="home__search_title">Busca una canción</p>
-        <div class="home__search_inputs">
+        <form class="home__search_inputs" @submit.prevent="searchSong">
           <input
             class="home__search_input"
             type="text"
             v-model="songName"
             placeholder="Introduce el nombre de una canción"
+            :class="{ required: songName === '' }"
+            required
           />
-          <button class="home__search_button" @click="somefunction">
+          <button class="home__search_button">
             <fa class="icon_Search" :icon="['fas', 'search']" /> Buscar
           </button>
+        </form>
+      </div>
+      <template v-if="songs.length !== 0">
+        <div class="home__list">
+          <ListSongs :songs="songs" />
         </div>
-      </div>
-      <div class="home__list">
-        <ListSongs :songs="songs" />
-      </div>
+      </template>
+      <template v-else>
+        <div class="errorMessage">
+          <div class="errorMessage__image">
+            <fa :icon="['fas', 'frown']" size="7x" />
+            <fa :icon="['fas', 'times-circle']" size="3x" />
+          </div>
+          <div class="errorMessage__text">
+            <p>
+              Lo siento, no hemos encontrado resultados para tu búsqueda.
+              Intenta con otra canción
+            </p>
+          </div>
+        </div>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import { useStore } from "vuex";
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, onMounted, ref } from "vue";
 import ListSongs from "../components/ListSongs.vue";
 export default {
   name: "Home",
@@ -36,27 +54,22 @@ export default {
     onMounted(() => {
       store.dispatch("getSongs", {
         token: localStorage.getItem("token"),
-        query: "Taylor Swift",
+        query: "a",
       });
     });
 
-    // watchEffect(() => {
-    //   store.dispatch("getSongs", {
-    //     token: localStorage.getItem("token"),
-    //     query: songName.value,
-    //   });
-    // });
-    const somefunction = () => {
+    const searchSong = () => {
       store.dispatch("getSongs", {
         token: localStorage.getItem("token"),
         query: songName.value,
       });
+      songName.value = "";
     };
     return {
       store,
       songs,
       songName,
-      somefunction,
+      searchSong,
     };
   },
   components: {
@@ -151,6 +164,28 @@ $green_Spotify: #1db954;
         color: rgba(0, 0, 0, 0.3);
       }
     }
+  }
+}
+
+.errorMessage {
+  color: #464646;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  &__image {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  &__text {
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
   }
 }
 

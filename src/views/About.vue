@@ -21,10 +21,14 @@
         <div class="about__info_album" v-text="song.album.name"></div>
         <div class="about__info_other">
           <p>
-            <strong>Fecha de lanzamiento: </strong>{{ song.album.release_date }}
+            <strong>Fecha de lanzamiento: </strong
+            >{{ formatDate(song.album.release_date) }}
           </p>
 
-          <p><strong>Duración: </strong>{{ song.duration_ms }}</p>
+          <p>
+            <strong>Duración: </strong
+            >{{ formatDuration(song.duration_ms) + " min" }}
+          </p>
           <p><strong>Popularidad: </strong>{{ song.popularity + "%" }}</p>
         </div>
       </div>
@@ -33,9 +37,9 @@
 </template>
 <script>
 import { useRoute } from "vue-router";
-import { computed, onBeforeMount, onMounted } from "vue";
+import { computed, onBeforeMount } from "vue";
 import { useStore } from "vuex";
-// import ListSongs from "../components/ListSongs.vue";
+import moment from "moment";
 
 export default {
   setup() {
@@ -53,12 +57,21 @@ export default {
 
     const song = computed(() => store.state.songSelected);
     const moreSongs = computed(() => store.state.songs);
-
+    const formatDate = (date) => {
+      return moment(date).format("dddd, MMMM Do YYYY");
+    };
+    const formatDuration = (duration) => {
+      return moment("2000-01-01 00:00:00")
+        .add(moment.duration(duration))
+        .format("mm:ss");
+    };
     return {
       route,
       store,
       song,
       moreSongs,
+      formatDate,
+      formatDuration,
     };
   },
   components: {
@@ -163,7 +176,7 @@ $green_Spotify: #1db954;
       color: #fefefe;
       font-size: 0.6em;
       strong {
-        color: #eee;
+        color: $green_Spotify;
       }
     }
   }
