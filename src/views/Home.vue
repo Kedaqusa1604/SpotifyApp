@@ -9,7 +9,6 @@
             type="text"
             v-model="songName"
             placeholder="Introduce el nombre de una canción"
-            :class="{ required: songName === '' }"
             required
           />
           <button class="home__search_button">
@@ -18,6 +17,7 @@
         </form>
       </div>
       <template v-if="songs.length !== 0">
+        <p class="home__message">{{ showMessage(result) }}</p>
         <div class="home__list">
           <ListSongs :songs="songs" />
         </div>
@@ -51,6 +51,7 @@ export default {
     const store = useStore();
     let songs = computed(() => store.state.songs);
     let songName = ref("");
+    let result = ref("a");
     onMounted(() => {
       store.dispatch("getSongs", {
         token: localStorage.getItem("token"),
@@ -59,17 +60,24 @@ export default {
     });
 
     const searchSong = () => {
+      result.value = songName.value;
       store.dispatch("getSongs", {
         token: localStorage.getItem("token"),
         query: songName.value,
       });
       songName.value = "";
     };
+
+    const showMessage = (message) => {
+      return "Resultados para: " + message;
+    };
     return {
       store,
       songs,
       songName,
+      result,
       searchSong,
+      showMessage,
     };
   },
   components: {
@@ -164,6 +172,12 @@ $green_Spotify: #1db954;
         color: rgba(0, 0, 0, 0.3);
       }
     }
+  }
+  &__message {
+    padding: 0 20px;
+    margin-bottom: 10px;
+    color: #eee;
+    font-size: 20px;
   }
 }
 
