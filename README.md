@@ -1,5 +1,8 @@
 # pruebaspotify
 
+prueba su funcionamiento en: https://kedaqusa1604.github.io/SpotifyApp
+
+
 ## Project setup
 ```
 yarn install
