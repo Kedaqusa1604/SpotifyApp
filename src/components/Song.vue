@@ -62,6 +62,7 @@ $background: #464646;
   grid-template-columns: 0px 190px 0px;
   gap: 5px;
   transition: all 0.3s ease;
+  overflow: hidden;
   &:hover {
     cursor: pointer;
     transform: scale(1.04);
@@ -71,9 +72,32 @@ $background: #464646;
     grid-row: 1/2;
     grid-column: 2/3;
     overflow: hidden;
+    background: #606061;
+    position: relative;
 
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 100%;
+      box-shadow: 0 0 0 5px rgba(#fff, 0.2) inset;
+      // z-index: -1;
+    }
+    &::before {
+      width: 80%;
+      height: 80%;
+    }
+    &::after {
+      width: 20%;
+      height: 20%;
+    }
     img {
+      position: relative;
       width: 100%;
+      z-index: 10;
     }
   }
   &__title {
@@ -126,9 +150,14 @@ $background: #464646;
       grid-row: 1/-1;
       display: flex;
       justify-content: center;
+      background: transparent;
       img {
         height: 100%;
         width: auto;
+      }
+      &::before,
+      &::after {
+        box-shadow: 0 0 0 2px rgba(#fff, 0.2) inset;
       }
     }
     &__title {

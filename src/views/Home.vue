@@ -1,6 +1,8 @@
 <template>
   <div class="window">
     <div class="home">
+      <!-- Barra de búsqueda -->
+
       <div class="home__search">
         <p class="home__search_title">Busca una canción</p>
         <form class="home__search_inputs" @submit.prevent="searchSong">
@@ -16,72 +18,87 @@
           </button>
         </form>
       </div>
-      <template v-if="songs.length !== 0">
-        <p class="home__message">{{ showMessage(result) }}</p>
-        <div class="home__list">
-          <ListSongs :songs="songs" />
+      <template v-if="!cookieState">
+        <div class="start">
+          <div class="start__image">
+            <img src="../assets/start.svg" />
+          </div>
+          <div class="start__text">
+            <p>Inicia buscando el nombre de una canción de tu preferencia</p>
+          </div>
         </div>
       </template>
       <template v-else>
-        <div class="errorMessage">
-          <div class="errorMessage__image">
-            <fa :icon="['fas', 'frown']" size="7x" />
-            <fa :icon="['fas', 'times-circle']" size="3x" />
-          </div>
-          <div class="errorMessage__text">
-            <p>
-              Lo siento, no hemos encontrado resultados para tu búsqueda.
-              Intenta con otra canción
-            </p>
-          </div>
-        </div>
+        <!-- Lista de canciones -->
+        <Suspense :key="reloadComponent">
+          <template #default>
+            <ListSongs :songName="result" />
+          </template>
+          <template #fallback>
+            <Loading />
+          </template>
+        </Suspense>
       </template>
     </div>
   </div>
 </template>
 
 <script>
-import { useStore } from "vuex";
-import { computed, onMounted, ref } from "vue";
+import { ref, onBeforeMount } from "vue";
 import ListSongs from "../components/ListSongs.vue";
+import Loading from "../components/Loading.vue";
 export default {
   name: "Home",
-  components: {},
   setup() {
-    const store = useStore();
-    let songs = computed(() => store.state.songs);
     let songName = ref("");
-    let result = ref("a");
-    onMounted(() => {
-      store.dispatch("getSongs", {
-        token: localStorage.getItem("token"),
-        query: "a",
-      });
+    let result = ref("");
+    let reloadComponent = ref(0);
+    let cookieState = ref(false);
+
+    const searchCookie = () => {
+      if (document.cookie) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    const getSongCookie = () => {
+      return document.cookie.substring(document.cookie.indexOf("=") + 1);
+    };
+
+    const verifyCookie = () => {
+      if (getSongCookie() != "") {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    onBeforeMount(() => {
+      cookieState.value = verifyCookie();
     });
 
     const searchSong = () => {
       result.value = songName.value;
-      store.dispatch("getSongs", {
-        token: localStorage.getItem("token"),
-        query: songName.value,
-      });
+      document.cookie = `busqueda=${songName.value}`;
+      cookieState.value = verifyCookie();
       songName.value = "";
+      reloadComponent.value++;
     };
 
-    const showMessage = (message) => {
-      return "Resultados para: " + message;
-    };
     return {
-      store,
-      songs,
       songName,
       result,
       searchSong,
-      showMessage,
+      reloadComponent,
+      searchCookie,
+      cookieState,
     };
   },
   components: {
     ListSongs,
+    Loading,
   },
 };
 </script>
@@ -200,6 +217,29 @@ $green_Spotify: #1db954;
     text-align: center;
     font-weight: 700;
     font-size: 20px;
+  }
+}
+
+.start {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  &__image {
+    width: 70%;
+    img {
+      width: 100%;
+    }
+  }
+  &__text {
+    width: 100%;
+    text-align: center;
+    color: rgba(#fff, 0.5);
   }
 }
 
