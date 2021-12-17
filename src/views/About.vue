@@ -47,7 +47,7 @@ export default {
 
     onBeforeMount(() => {
       store.dispatch("getSongSelected", {
-        token: localStorage.getItem("token"),
+        token: sessionStorage.getItem("token"),
         id_song: route.params.id,
       });
     });

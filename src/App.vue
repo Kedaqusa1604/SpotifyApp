@@ -3,14 +3,14 @@
 </template>
 
 <script>
-import { onMounted } from "vue";
+import { onBeforeMount } from "vue";
 import { getToken } from "./api/getToken";
 
 export default {
   setup() {
-    onMounted(() => {
+    onBeforeMount(() => {
       getToken().then((token) => {
-        localStorage.setItem("token", token.access_token);
+        sessionStorage.setItem("token", token.access_token);
       });
     });
   },
