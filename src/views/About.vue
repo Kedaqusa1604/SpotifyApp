@@ -1,9 +1,9 @@
 <template>
   <div class="window">
     <div class="about">
-      <div class="about__description">
+      <div class="about__description" id="about__description">
         <div class="about__description_image">
-          <img :src="song.album.images[1].url" :alt="song.name" />
+          <img :src="song.album.images[1].url" :alt="song.name" crossorigin />
         </div>
         <div class="about__description_data">
           <p class="about__description_data-title" v-text="song.name"></p>
@@ -37,25 +37,37 @@
 </template>
 <script>
 import { useRoute } from "vue-router";
-import { computed, onBeforeMount } from "vue";
+import { computed, onBeforeMount, onMounted } from "vue";
 import { useStore } from "vuex";
+import getColor from "../api/getImageColor";
 import moment from "moment";
 
 export default {
   setup() {
     const store = useStore();
-
+    const song = computed(() => store.state.songSelected);
     onBeforeMount(() => {
       store.dispatch("getSongSelected", {
         token: sessionStorage.getItem("token"),
         id_song: route.params.id,
       });
     });
+    onMounted(() => {
+      const image = document.querySelector("img");
+      const about = document.getElementById("about__description");
+
+      image.onload = () => {
+        const { R, G, B } = getColor(image, 4);
+        about.style.background = `linear-gradient(to bottom, rgba(${R},${G},${B},1) 0%, rgba(${R},${G},${B},0.3)`;
+      };
+    });
+
+    //background-color: #4158D
+
     const route = useRoute();
 
     console.log(route.params.id);
 
-    const song = computed(() => store.state.songSelected);
     const moreSongs = computed(() => store.state.songs);
     const formatDate = (date) => {
       return moment(date).format("dddd, MMMM Do YYYY");
@@ -95,15 +107,19 @@ $green_Spotify: #1db954;
   grid-template-columns: 320px auto;
   grid-template-rows: 100%;
   position: relative;
+
   &__description {
     grid-column: 1/2;
     grid-row: 1/-1;
     // background: red;
+
     padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-
+    background-position-x: center;
+    background-size: cover;
+    backdrop-filter: blur(2px);
     &_image {
       width: 100%;
       img {
@@ -131,7 +147,6 @@ $green_Spotify: #1db954;
       align-items: center;
       border-radius: 100px;
       align-self: center;
-
       position: relative;
       &:before {
         content: "";
